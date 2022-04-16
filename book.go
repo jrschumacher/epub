@@ -16,7 +16,8 @@ type Book struct {
 	Container Container `json:"-"`
 	Mimetype  string    `json:"-"`
 
-	fd *zip.ReadCloser
+	fd    *zip.Reader
+	close func()
 }
 
 //Open open resource file
@@ -35,7 +36,7 @@ func (p *Book) Files() []string {
 
 //Close close file reader
 func (p *Book) Close() {
-	p.fd.Close()
+	p.close()
 }
 
 func (p *Book) ReadAllContent() []byte {

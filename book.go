@@ -38,6 +38,30 @@ func (p *Book) Close() {
 	p.fd.Close()
 }
 
+func (p *Book) ReadAllContent() []byte {
+	var contents []byte
+	for _, item := range p.Opf.Manifest {
+		if item.MediaType != "application/xhtml+xml" &&
+			item.MediaType != "application/xhtml" &&
+			item.MediaType != "text/html" &&
+			item.MediaType != "text/plain" {
+			continue
+		}
+		fd, err := p.Open(item.Href)
+		if err != nil {
+			continue
+		}
+		defer fd.Close()
+
+		bytes, err := ioutil.ReadAll(fd)
+		if err != nil {
+			continue
+		}
+		contents = append(contents, bytes...)
+	}
+	return contents
+}
+
 //-----------------------------------------------------------------------------
 func (p *Book) filename(n string) string {
 	return path.Join(path.Dir(p.Container.Rootfile.Path), n)
